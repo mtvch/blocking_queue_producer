@@ -61,5 +61,9 @@ defmodule BlockingQueueProducer.PromExPlugin do
         name: to_string(server)
       })
     end)
+  rescue
+    # Broadway may be not started yet
+    _e ->
+      :ok
   end
 end
