@@ -33,14 +33,13 @@ defmodule BlockingQueueProducer.PromExPlugin do
       Keyword.get(opts, :metric_prefix, PromEx.metric_prefix(otp_app, :blocking_queue_producer))
 
     poll_rate = Keyword.get(opts, :poll_rate, 5_000)
-
-    blocking_queue_producers = Keyword.fetch!(opts, :blocking_queue_producers)
+    producers = Keyword.fetch!(opts, :producers)
 
     # Queue length details
     Polling.build(
       :blocking_queue_producer_polling_metrics,
       poll_rate,
-      {__MODULE__, :execute_polling_metrics, [blocking_queue_producers]},
+      {__MODULE__, :execute_polling_metrics, [producers]},
       [
         last_value(
           metric_prefix ++ [:blocking_queue_producer, :queue, :length, :count],
@@ -53,9 +52,8 @@ defmodule BlockingQueueProducer.PromExPlugin do
     )
   end
 
-  def execute_polling_metrics(blocking_queue_producers)
-      when is_function(blocking_queue_producers) do
-    blocking_queue_producers.()
+  def execute_polling_metrics(producers) when is_function(producers) do
+    producers.()
     |> Enum.each(fn server ->
       queue_length = BlockingQueueProducer.queue_length(server)
 
