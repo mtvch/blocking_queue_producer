@@ -61,9 +61,9 @@ defmodule BlockingQueueProducer.PromExPlugin do
         name: to_string(server)
       })
     end)
-  rescue
+  catch
     # Broadway may be not started yet
-    _e ->
+    :exit, {:noproc, _} ->
       :ok
   end
 end
